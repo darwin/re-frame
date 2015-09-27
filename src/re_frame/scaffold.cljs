@@ -1,7 +1,8 @@
 (ns re-frame.scaffold
   (:refer-clojure :exclude [flush])
   (:require-macros [cljs.core.async.macros :refer [go-loop go]])
-  (:require [cljs.core.async :refer [chan put! <! timeout]]
+  (:require [cljs.core.async :refer [chan put! <! timeout close!]]
+            [goog.async.nextTick]
             [reagent.core :as reagent]
             [re-frame.frame :as frame]
             [re-frame.legacy :as legacy]
@@ -89,7 +90,7 @@
 ; In a perpetual loop, read events from "event-chan", and call the right handler.
 ;
 ; Because handlers occupy the CPU, before each event is handled, hand
-; back control to the browser, via a (<! (timeout 0)) call.
+; back control to the browser, via a (<! (yield 0)) call.
 ;
 ; In some cases, we need to pause for an entire animationFrame, to ensure that
 ; the DOM is fully flushed, before then calling a handler known to hog the CPU
@@ -98,12 +99,20 @@
 ;   (dispatch ^:flush-dom  [:event-id other params])
 ;
 
+(defn yield
+  "Yields control to the browser. Faster than (timeout 0).
+  See http://dev.clojure.org/jira/browse/ASYNC-137"
+  []
+  (let [ch (chan)]
+    (goog.async.nextTick #(close! ch))
+    ch))
+
 (defn router-loop* [db-atom frame-atom]
   (go-loop []
     (let [event (<! event-chan)                                                                                       ; wait for an event
           _ (if (:flush-dom (meta event))                                                                             ; check the event for metadata
               (do (reagent/flush) (<! (timeout 20)))                                                                  ; wait just over one annimation frame (16ms), to rensure all pending GUI work is flushed to the DOM.
-              (<! (timeout 0)))]                                                                                      ; just in case we are handling one dispatch after an other, give the browser back control to do its stuff
+              (<! (yield)))]                                                                                          ; just in case we are handling one dispatch after an other, give the browser back control to do its stuff
       (try
         (frame/process-event-on-atom! @frame-atom db-atom event)
 
