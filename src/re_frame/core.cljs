@@ -24,7 +24,6 @@
 
 (def pure scaffold/pure)
 (def debug scaffold/debug)
-;(def undoable scaffold/undoable)
 (def path scaffold/path)
 (def enrich scaffold/enrich)
 (def trim-v scaffold/trim-v)

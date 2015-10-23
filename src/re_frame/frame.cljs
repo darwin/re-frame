@@ -74,10 +74,8 @@
   (let [subscription-id (get-subscription-id subscription-spec)
         handler-fn (get-in frame [:subscriptions subscription-id])]
     (if (nil? handler-fn)
-      (do
-        (error frame
-          "re-frame: no subscription handler registered for: \"" subscription-id "\".  Returning a nil subscription.")
-        nil)
+      (error frame
+        "re-frame: no subscription handler registered for: \"" subscription-id "\".  Returning a nil subscription.")
       (apply handler-fn subscription-spec))))
 
 ; -- utilities -------------------------------------------------------------------------------------------------------

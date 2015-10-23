@@ -3,7 +3,7 @@
 (defn make-logger-for-key [logger-key]
   (fn [frame & args]
     (if-let [logger-fn (get-in frame [:loggers logger-key])]
-      (apply logger-fn args)
+      (do (apply logger-fn args) nil)
       (throw (js/Error. (str "re-frame: missing logger \"" logger-key "\""))))))
 
 ; logging helpers

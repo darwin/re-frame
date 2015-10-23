@@ -40,10 +40,8 @@
   (let [subscription-id (utils/get-subscription-id subscription-spec)
         handler-fn (get-in @frame-atom [:subscriptions subscription-id])]
     (if (nil? handler-fn)
-      (do
-        (error @frame-atom
-          "re-frame: no subscription handler registered for: \"" subscription-id "\".  Returning a nil subscription.")
-        nil)
+      (error @frame-atom
+        "re-frame: no subscription handler registered for: \"" subscription-id "\".  Returning a nil subscription.")
       (handler-fn app-db-atom subscription-spec))))
 
 (defn subscribe [subscription-spec]

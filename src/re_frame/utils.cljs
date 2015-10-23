@@ -1,14 +1,12 @@
 (ns re-frame.utils
   (:require [re-frame.logging :refer [log warn error]]))
 
-(defn get-event-id
-  [v]
+(defn get-event-id [v]
   (if (vector? v)
     (first v)
     (throw (js/Error. (str "re-frame: expected a vector event, but got: " v)))))
 
-(defn get-subscription-id
-  [v]
+(defn get-subscription-id [v]
   (if (vector? v)
     (first v)
     (throw (js/Error. (str "re-frame: expected a vector subscription, but got: " v)))))
@@ -31,17 +29,14 @@
 
 (defn compose-middleware
   "Given a vector of middleware, filter out any nils, and use \"comp\" to compose the elements.
-  v can have nested vectors, and will be flattened before \"comp\" is applied.
-  For convienience, if v is a function (assumed to be middleware already), just return it.
-  Filtering out nils allows us to create Middleware conditionally like this:
-     (comp-middleware [pure (when debug? debug)])  ; that 'when' might leave a nil
+v can have nested vectors, and will be flattened before \"comp\" is applied.
+For convienience, if v is a function (assumed to be middleware already), just return it.
+Filtering out nils allows us to create Middleware conditionally like this:
+   (comp-middleware [pure (when debug? debug)])  ; that 'when' might leave a nil
   "
   [frame what]
   (let [spec (if (seqable? what) (seq what) what)]
     (cond
       (fn? spec) spec                                                                                                 ; assumed to be existing middleware
-      (seq? spec) (let [middlewares (remove nil? (flatten spec))]
-                    (apply comp middlewares))
-      :else (do
-              (warn frame "re-frame: comp-middleware expects a vector, got: " what)
-              nil))))
+      (seq? spec) (apply comp (remove nil? (flatten spec)))
+      :else (warn frame "re-frame: comp-middleware expects a vector, got: " what))))
