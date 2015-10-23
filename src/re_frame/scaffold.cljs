@@ -52,7 +52,6 @@
 
 (def pure (legacy/pure app-frame))
 (def debug (middleware/debug app-frame))
-;(def undoable (middleware/undoable app-frame))
 (def path (middleware/path app-frame))
 (def enrich (middleware/enrich app-frame))
 (def trim-v (middleware/trim-v app-frame))
@@ -84,13 +83,6 @@
 ; Using core.async means we can have the aysnc handling of events.
 ;
 (def ^:private event-chan (chan))                                                                                     ; TODO: set buffer size?
-
-(defn purge-chan
-  "read all pending events from the channel and drop them on the floor"
-  []
-  #_(loop []                                                                                                          ; TODO commented out until poll! is a part of the core.asyc API
-      (when (go (poll! event-chan))                                                                                   ; progress: https://github.com/clojure/core.async/commit/d8047c0b0ec13788c1092f579f03733ee635c493
-        (recur))))
 
 ; -- router loop -----------------------------------------------------------------------------------------------------
 ;
@@ -125,10 +117,7 @@
         ;     events if the prior event failed.
         (catch js/Object e
           (do
-            ; try to recover from this (probably uncaught) error as best we can
-            (purge-chan)                                                                                              ; get rid of any pending events
             (router-loop* db-atom frame-atom)                                                                         ; Exception throw will cause termination of go-loop. So, start another.
-
             (throw e)))))                                                                                             ; re-throw so the rest of the app's infrastructure (window.onerror?) gets told
     (recur)))
 
