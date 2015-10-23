@@ -22,7 +22,6 @@
 (def register-handler scaffold/register-handler)
 (def unregister-handler scaffold/unregister-handler)
 
-(def pure scaffold/pure)
 (def debug scaffold/debug)
 (def path scaffold/path)
 (def enrich scaffold/enrich)

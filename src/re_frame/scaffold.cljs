@@ -5,7 +5,6 @@
             [goog.async.nextTick]
             [reagent.core :as reagent]
             [re-frame.frame :as frame]
-            [re-frame.legacy :as legacy]
             [re-frame.middleware :as middleware]
             [re-frame.logging :refer [log warn error]]
             [re-frame.utils :as utils]))
@@ -51,7 +50,6 @@
 (defn clear-event-handlers! []
   (swap! app-frame #(frame/clear-event-handlers %)))
 
-(def pure (legacy/pure app-frame))
 (def debug (middleware/debug app-frame))
 (def path (middleware/path app-frame))
 (def enrich (middleware/enrich app-frame))
