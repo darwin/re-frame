@@ -5,10 +5,10 @@
 ; note: by including this namespace, you will get default app-db, default app-frame
 ; and start default router-loop automatically
 
-(def app-db scaffold/app-db)                                ; the default instance of app-db
-(def app-frame scaffold/app-frame)                          ; the default instance of re-frame
+(def app-db scaffold/app-db)                                                                                          ; the default instance of app-db
+(def app-frame scaffold/app-frame)                                                                                    ; the default instance of re-frame
 
-;; --  API  -------
+; --  API  -----------------------------------------------------------------------------------------------------------
 
 (def router-loop scaffold/router-loop)
 (def set-loggers! scaffold/set-loggers!)
@@ -32,5 +32,5 @@
 (def log-ex scaffold/log-ex)
 (def on-changes scaffold/on-changes)
 
-;; start event processing
+; start event processing
 (scaffold/router-loop)

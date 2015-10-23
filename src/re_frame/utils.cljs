@@ -27,7 +27,7 @@
   (if-not (identical? @db-atom new-db-state)
     (reset! db-atom new-db-state)))
 
-;; -- composing middleware  -----------------------------------------------------------------------
+; -- composing middleware  -------------------------------------------------------------------------------------------
 
 (defn report-middleware-factories
   "See https://github.com/Day8/re-frame/issues/65"
@@ -39,19 +39,20 @@
             [v]
             (remove nil? (map name-of-factory v)))]
     (doseq [name (factory-names-in v)]
-      (error frame "re-frame: \"" name "\" used incorrectly. Must be used like this \"(" name " ...)\", whereas you just used \"" name "\"."))))
+      (error frame "re-frame: \"" name "\" used incorrectly. Must be used like this \"(" name
+        " ...)\", whereas you just used \"" name "\"."))))
 
 (defn compose-middleware
   "Given a vector of middleware, filter out any nils, and use \"comp\" to compose the elements.
   v can have nested vectors, and will be flattened before \"comp\" is applied.
   For convienience, if v is a function (assumed to be middleware already), just return it.
   Filtering out nils allows us to create Middleware conditionally like this:
-     (comp-middleware [pure (when debug? debug)])  ;; that 'when' might leave a nil
+     (comp-middleware [pure (when debug? debug)])  ; that 'when' might leave a nil
   "
   [frame what]
   (let [spec (if (seqable? what) (seq what) what)]
     (cond
-      (fn? spec) spec                                       ;; assumed to be existing middleware
+      (fn? spec) spec                                                                                                 ; assumed to be existing middleware
       (seq? spec) (let [middlewares (remove nil? (flatten spec))]
                     (report-middleware-factories frame middlewares)
                     (apply comp middlewares))

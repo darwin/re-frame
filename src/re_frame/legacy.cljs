@@ -2,7 +2,7 @@
   (:require [reagent.ratom :refer [IReactiveAtom]]
             [re-frame.logging :refer [log warn error group group-end]]))
 
-;; See docs in the Wiki: https://github.com/Day8/re-frame/wiki
+; See docs in the Wiki: https://github.com/Day8/re-frame/wiki
 
 ; this middleware is included for backward compatibility, it is not used anymore
 (defn pure
@@ -24,7 +24,7 @@
           (if (map? app-db)
             (warn @frame-atom "re-frame: Looks like \"pure\" is in the middleware pipeline twice. Ignoring.")
             (warn @frame-atom "re-frame: \"pure\" middleware not given a Ratom.  Got: " app-db))
-          handler)                                          ;; turn this into a noop handler
+          handler)                                                                                                    ; turn this into a noop handler
         (let [db @app-db
               new-db (handler db event-vec)]
           (if (nil? new-db)

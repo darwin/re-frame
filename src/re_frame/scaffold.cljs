@@ -41,7 +41,8 @@
         handler-fn (get-in @frame-atom [:subscriptions subscription-id])]
     (if (nil? handler-fn)
       (do
-        (error @frame-atom "re-frame: no subscription handler registered for: \"" subscription-id "\".  Returning a nil subscription.")
+        (error @frame-atom
+          "re-frame: no subscription handler registered for: \"" subscription-id "\".  Returning a nil subscription.")
         nil)
       (handler-fn app-db-atom subscription-spec))))
 
@@ -61,7 +62,7 @@
 (def log-ex (middleware/log-ex app-frame))
 (def on-changes (middleware/on-changes app-frame))
 
-;; -- composing middleware  -----------------------------------------------------------------------
+; -- composing middleware  -------------------------------------------------------------------------------------------
 
 (defn register-base
   "register a handler for an event.
@@ -71,71 +72,71 @@
    (swap! app-frame-atom #(frame/register-event-handler % event-id handler-fn)))
 
   ([app-frame-atom event-id middleware handler-fn]
-   (if-let [mid-ware (utils/compose-middleware @app-frame middleware)] ;; compose the middleware
-     (register-base app-frame-atom event-id (mid-ware handler-fn))))) ;; wrap the handler in the middleware
+   (if-let [mid-ware (utils/compose-middleware @app-frame middleware)]                                                ; compose the middleware
+     (register-base app-frame-atom event-id (mid-ware handler-fn)))))                                                 ; wrap the handler in the middleware
 
 (def register-handler (partial register-base app-frame))
 
 (defn unregister-handler [event-id]
   (swap! app-frame #(frame/unregister-event-handler % event-id)))
 
-;; -- The Event Conveyor Belt  --------------------------------------------------------------------
-;;
-;; Moves events from "dispatch" to the router loop.
-;; Using core.async means we can have the aysnc handling of events.
-;;
-(def ^:private event-chan (chan))                           ;; TODO: set buffer size?
+; -- The Event Conveyor Belt  ----------------------------------------------------------------------------------------
+;
+; Moves events from "dispatch" to the router loop.
+; Using core.async means we can have the aysnc handling of events.
+;
+(def ^:private event-chan (chan))                                                                                     ; TODO: set buffer size?
 
 (defn purge-chan
   "read all pending events from the channel and drop them on the floor"
   []
-  #_(loop []                                                ;; TODO commented out until poll! is a part of the core.asyc API
-      (when (go (poll! event-chan))                         ;; progress: https://github.com/clojure/core.async/commit/d8047c0b0ec13788c1092f579f03733ee635c493
+  #_(loop []                                                                                                          ; TODO commented out until poll! is a part of the core.asyc API
+      (when (go (poll! event-chan))                                                                                   ; progress: https://github.com/clojure/core.async/commit/d8047c0b0ec13788c1092f579f03733ee635c493
         (recur))))
 
-;; -- router loop ---------------------------------------------------------------------------------
-;;
-;; In a perpetual loop, read events from "event-chan", and call the right handler.
-;;
-;; Because handlers occupy the CPU, before each event is handled, hand
-;; back control to the browser, via a (<! (timeout 0)) call.
-;;
-;; In some cases, we need to pause for an entire animationFrame, to ensure that
-;; the DOM is fully flushed, before then calling a handler known to hog the CPU
-;; for an extended period.  In such a case, the event should be laballed with metadata
-;; Example usage (notice the ":flush-dom" metadata):
-;;   (dispatch ^:flush-dom  [:event-id other params])
-;;
+; -- router loop -----------------------------------------------------------------------------------------------------
+;
+; In a perpetual loop, read events from "event-chan", and call the right handler.
+;
+; Because handlers occupy the CPU, before each event is handled, hand
+; back control to the browser, via a (<! (timeout 0)) call.
+;
+; In some cases, we need to pause for an entire animationFrame, to ensure that
+; the DOM is fully flushed, before then calling a handler known to hog the CPU
+; for an extended period.  In such a case, the event should be laballed with metadata
+; Example usage (notice the ":flush-dom" metadata):
+;   (dispatch ^:flush-dom  [:event-id other params])
+;
 
 (defn router-loop* [db-atom frame-atom]
   (go-loop []
-    (let [event (<! event-chan)                             ;; wait for an event
-          _ (if (:flush-dom (meta event))                   ;; check the event for metadata
-              (do (reagent/flush) (<! (timeout 20)))        ;; wait just over one annimation frame (16ms), to rensure all pending GUI work is flushed to the DOM.
-              (<! (timeout 0)))]                            ;; just in case we are handling one dispatch after an other, give the browser back control to do its stuff
+    (let [event (<! event-chan)                                                                                       ; wait for an event
+          _ (if (:flush-dom (meta event))                                                                             ; check the event for metadata
+              (do (reagent/flush) (<! (timeout 20)))                                                                  ; wait just over one annimation frame (16ms), to rensure all pending GUI work is flushed to the DOM.
+              (<! (timeout 0)))]                                                                                      ; just in case we are handling one dispatch after an other, give the browser back control to do its stuff
       (try
         (frame/process-event-on-atom! @frame-atom db-atom event)
 
-        ;; If the handler throws:
-        ;;   - allow the exception to bubble up because the app, in production,
-        ;;     may have hooked window.onerror and perform special processing.
-        ;;   - But an exception which bubbles up will break the enclosing go-loop.
-        ;;     So we'll need to start another one.
-        ;;   - purge any pending events, because they are probably related to the
-        ;;     event which just fell in a screaming heap. Not sane to handle further
-        ;;     events if the prior event failed.
+        ; If the handler throws:
+        ;   - allow the exception to bubble up because the app, in production,
+        ;     may have hooked window.onerror and perform special processing.
+        ;   - But an exception which bubbles up will break the enclosing go-loop.
+        ;     So we'll need to start another one.
+        ;   - purge any pending events, because they are probably related to the
+        ;     event which just fell in a screaming heap. Not sane to handle further
+        ;     events if the prior event failed.
         (catch js/Object e
           (do
-            ;; try to recover from this (probably uncaught) error as best we can
-            (purge-chan)                                    ;; get rid of any pending events
-            (router-loop* db-atom frame-atom)               ;; Exception throw will cause termination of go-loop. So, start another.
+            ; try to recover from this (probably uncaught) error as best we can
+            (purge-chan)                                                                                              ; get rid of any pending events
+            (router-loop* db-atom frame-atom)                                                                         ; Exception throw will cause termination of go-loop. So, start another.
 
-            (throw e)))))                                   ;; re-throw so the rest of the app's infrastructure (window.onerror?) gets told
+            (throw e)))))                                                                                             ; re-throw so the rest of the app's infrastructure (window.onerror?) gets told
     (recur)))
 
 (def router-loop (partial router-loop* app-db app-frame))
 
-;; -- dispatch ------------------------------------------------------------------------------------
+; -- dispatch --------------------------------------------------------------------------------------------------------
 
 (defn dispatch*
   "Send an event to be processed by the registered handler.
@@ -145,9 +146,9 @@
   "
   [frame-atom event-v]
   (if (nil? event-v)
-    (error @frame-atom "re-frame: \"dispatch\" is ignoring a nil event.") ;; nil would close the channel
+    (error @frame-atom "re-frame: \"dispatch\" is ignoring a nil event.")                                             ; nil would close the channel
     (put! event-chan event-v))
-  nil)                                                      ;; Ensure nil return. See https://github.com/Day8/re-frame/wiki/Beware-Returning-False
+  nil)                                                                                                                ; Ensure nil return. See https://github.com/Day8/re-frame/wiki/Beware-Returning-False
 
 (def dispatch (partial dispatch* app-frame))
 
@@ -159,6 +160,6 @@
      (dispatch-sync [:delete-item 42])"
   [db-atom frame-atom event]
   (frame/process-event-on-atom! @frame-atom db-atom event)
-  nil)                                                      ;; Ensure nil return. See https://github.com/Day8/re-frame/wiki/Beware-Returning-False
+  nil)                                                                                                                ; Ensure nil return. See https://github.com/Day8/re-frame/wiki/Beware-Returning-False
 
 (def dispatch-sync (partial dispatch-sync* app-db app-frame))

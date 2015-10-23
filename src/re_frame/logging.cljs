@@ -25,23 +25,23 @@
   (.apply (.-error js/console) js/console (into-array args)))
 
 (defn js-console-group [& args]
-  (if (.-group js/console)                                  ;; group does not exist  < IE 11
+  (if (.-group js/console)                                                                                            ; group does not exist  < IE 11
     (.apply (.-group js/console) js/console (into-array args))
     (apply js-console-log args)))
 
 (defn js-console-group-end [& args]
-  (if (.-groupEnd js/console)                               ;; groupEnd does not exist  < IE 11
+  (if (.-groupEnd js/console)                                                                                         ; groupEnd does not exist  < IE 11
     (.apply (.-groupEnd js/console) js/console (into-array args))))
 
-;; -- Logging -----------------------------------------------------------------
-;;
-;; re-frame internally uses a set of logging functions which, by default,
-;; print to js/console.
-;; Use set-loggers! if you want to change this default behaviour.
-;; In production environment, you may want to capture exceptions and POST
-;; them somewhere.  to , you might want to override the way that exceptions are
-;; handled by overridding "error"
-;;
+; -- Logging ---------------------------------------------------------------------------------------------------------
+;
+; re-frame internally uses a set of logging functions which, by default,
+; print to js/console.
+; Use set-loggers! if you want to change this default behaviour.
+; In production environment, you may want to capture exceptions and POST
+; them somewhere.  to , you might want to override the way that exceptions are
+; handled by overridding "error"
+;
 (def default-loggers
   {:log      js-console-log
    :warn     js-console-warn

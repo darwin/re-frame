@@ -3,7 +3,7 @@
             [re-frame.logging :refer [log warn error group group-end]]))
 
 
-;; See docs in the Wiki: https://github.com/Day8/re-frame/wiki
+; See docs in the Wiki: https://github.com/Day8/re-frame/wiki
 
 (defn log-ex
   "Middleware which catches and prints any handler-generated exceptions to console.
@@ -18,10 +18,13 @@
   (fn [handler]
     (fn log-ex-handler
       [db v]
-      (warn @frame-atom "re-frame: use of \"log-ex\" is deprecated. You don't need it any more IF YOU ARE USING CHROME 44. Chrome now seems to now produce good stack traces.")
+      (warn @frame-atom
+        (str
+          "re-frame: use of \"log-ex\" is deprecated. You don't need it any more IF YOU ARE USING CHROME 44."
+          " Chrome now seems to now produce good stack traces."))
       (try
         (handler db v)
-        (catch :default e                                   ;; ooops, handler threw
+        (catch :default e                                                                                             ; ooops, handler threw
           (do
             (.error js/console (.-stack e))
             (throw e)))))))
@@ -51,7 +54,7 @@
   more aesthetically pleasing handlers. No leading underscore on the event-v!
   Your handlers will look like this:
       (defn my-handler
-        [db [x y z]]    ;; <-- instead of [_ x y z]
+        [db [x y z]]    ; <-- instead of [_ x y z]
         ....)
   "
   [_frame-atom]
@@ -61,17 +64,17 @@
       (handler db (vec (rest v))))))
 
 
-;; -- Middleware Factories ----------------------------------------------------
-;;
-;; Note: weird approach defn-ing middleware factories below. Why? Because
-;; I wanted to put some metadata on them (useful for later checking).
-;; Found I had to do it this way:
-;;   (def fn-name
-;;     "docstring"
-;;     ^{....}       ;; middleware put on the following fn
-;;     (fn fn-name ....))
-;;
-;; So, yeah, weird.
+; -- Middleware Factories ----------------------------------------------------
+;
+; Note: weird approach defn-ing middleware factories below. Why? Because
+; I wanted to put some metadata on them (useful for later checking).
+; Found I had to do it this way:
+;   (def fn-name
+;     "docstring"
+;     ^{....}       ; middleware put on the following fn
+;     (fn fn-name ....))
+;
+; So, yeah, weird.
 
 (defn path
   "A middleware factory which supplies a sub-tree of `db` to the handler.
@@ -164,11 +167,11 @@
       (fn after-handler
         [db v]
         (let [new-db (handler db v)]
-          (f new-db v)                                      ;; call f for side effects
+          (f new-db v)                                                                                                ; call f for side effects
           new-db)))))
 
 
-;; EXPERIMENTAL
+; EXPERIMENTAL
 
 (defn on-changes
   "Middleware factory which acts a bit like \"reaction\"  (but it flows into db , rather than out)
@@ -198,15 +201,15 @@
       [handler]
       (fn on-changed-handler
         [db v]
-        (let [;; run the handler, computing a new generation of db
+        (let [; run the handler, computing a new generation of db
               new-db (handler db v)
 
-              ;; work out if any "inputs" have changed
+              ; work out if any "inputs" have changed
               new-ins (map #(get-in new-db %) in-paths)
               old-ins (map #(get-in db %) in-paths)
               changed-ins? (some false? (map identical? new-ins old-ins))]
 
-          ;; if one of the inputs has changed, then run 'f'
+          ; if one of the inputs has changed, then run 'f'
           (if changed-ins?
             (assoc-in new-db out-path (apply f new-ins))
             new-db))))))
