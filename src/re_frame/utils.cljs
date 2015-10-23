@@ -29,19 +29,6 @@
 
 ; -- composing middleware  -------------------------------------------------------------------------------------------
 
-(defn report-middleware-factories
-  "See https://github.com/Day8/re-frame/issues/65"
-  [frame v]
-  (letfn [(name-of-factory
-            [f]
-            (-> f meta :re-frame-factory-name))
-          (factory-names-in
-            [v]
-            (remove nil? (map name-of-factory v)))]
-    (doseq [name (factory-names-in v)]
-      (error frame "re-frame: \"" name "\" used incorrectly. Must be used like this \"(" name
-        " ...)\", whereas you just used \"" name "\"."))))
-
 (defn compose-middleware
   "Given a vector of middleware, filter out any nils, and use \"comp\" to compose the elements.
   v can have nested vectors, and will be flattened before \"comp\" is applied.
@@ -54,7 +41,6 @@
     (cond
       (fn? spec) spec                                                                                                 ; assumed to be existing middleware
       (seq? spec) (let [middlewares (remove nil? (flatten spec))]
-                    (report-middleware-factories frame middlewares)
                     (apply comp middlewares))
       :else (do
               (warn frame "re-frame: comp-middleware expects a vector, got: " what)

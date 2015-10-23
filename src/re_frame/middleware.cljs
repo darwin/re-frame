@@ -64,17 +64,7 @@
       (handler db (vec (rest v))))))
 
 
-; -- Middleware Factories ----------------------------------------------------
-;
-; Note: weird approach defn-ing middleware factories below. Why? Because
-; I wanted to put some metadata on them (useful for later checking).
-; Found I had to do it this way:
-;   (def fn-name
-;     "docstring"
-;     ^{....}       ; middleware put on the following fn
-;     (fn fn-name ....))
-;
-; So, yeah, weird.
+; -- Middleware Factories --------------------------------------------------------------------------------------------
 
 (defn path
   "A middleware factory which supplies a sub-tree of `db` to the handler.
@@ -87,7 +77,6 @@
      (path [:some :path] [:to] :here)
   "
   [frame-atom]
-  ;^{:re-frame-factory-name "path"}
   (fn path
     [& args]
     (let [path (flatten args)]
@@ -98,29 +87,6 @@
         (fn path-handler
           [db v]
           (assoc-in db path (handler (get-in db path) v)))))))
-
-
-#_(def undoable
-    "A Middleware factory which stores an undo checkpoint.
-    \"explanation\" can be either a string or a function. If it is a
-    function then must be:  (db event-vec) -> string.
-    \"explanation\" can be nil. in which case \"\" is recorded.
-    "
-    ^{:re-frame-factory-name "undoable"}
-    (fn undoable
-      [explanation]
-      (fn undoable-middleware
-        [handler]
-        (fn undoable-handler
-          [db event-vec]
-          (let [explanation (cond
-                              (fn? explanation) (explanation db event-vec)
-                              (string? explanation) explanation
-                              (nil? explanation) ""
-                              :else (error "re-frame: \"undoable\" middleware given a bad parameter. Got: " explanation))]
-            (store-now! explanation)
-            (handler db event-vec))))))
-
 
 (defn enrich
   "Middleware factory which runs a given function \"f\" in the after position.
@@ -141,7 +107,6 @@
   By applying \"f\" in middleware, we keep the handlers simple and yet we
   ensure this important step is not missed."
   [_frame-atom]
-  ;^{:re-frame-factory-name "enrich"}
   (fn enrich
     [f]
     (fn enrich-middleware
@@ -159,7 +124,6 @@
   In effect, \"f\" is meant to sideeffect. It gets no chance to change db. See \"enrich\"
   (if you need that.)"
   [_frame-atom]
-  ;^{:re-frame-factory-name "after"}
   (fn after
     [f]
     (fn after-middleware
@@ -194,7 +158,6 @@
      - assoc the return value from 'f' into the path  [:c]
   "
   [_frame-atom]
-  ;^{:re-frame-factory-name "on-changes"}
   (fn on-changes
     [f out-path & in-paths]
     (fn on-changed-middleware
