@@ -86,7 +86,7 @@
         [handler]
         (fn path-handler
           [db v]
-          (assoc-in db path (handler (get-in db path) v)))))))
+          (update-in db path handler v))))))
 
 (defn enrich
   "Middleware factory which runs a given function \"f\" in the after position.
