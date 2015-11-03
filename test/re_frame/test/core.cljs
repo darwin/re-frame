@@ -3,12 +3,12 @@
                    [reagent.ratom :refer [reaction run!]])
   (:require [cemerick.cljs.test]
             [re-frame.core :as core]
-            [re-frame.scaffold :as scaffold]))
+            [re-frame.v041 :as v041]))
 
 (defn reinitialize! []
   ; TODO: figure out, how to force channel flush
-  (reset! core/app-db @(scaffold/make-app-db-atom))
-  (reset! core/app-frame @(scaffold/make-frame-atom)))
+  (reset! core/app-db @(v041/make-app-db-atom))
+  (reset! core/app-frame @(v041/make-frame-atom)))
 
 (deftest modify-app-db-sync
   (testing "modify app-db via handler (sync)"

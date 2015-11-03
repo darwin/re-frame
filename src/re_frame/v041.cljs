@@ -1,4 +1,4 @@
-(ns re-frame.scaffold
+(ns re-frame.v041
   (:refer-clojure :exclude [flush])
   (:require-macros [cljs.core.async.macros :refer [go-loop go]])
   (:require [cljs.core.async :refer [chan put! <! timeout close!]]
@@ -8,7 +8,7 @@
             [re-frame.logging :refer [log warn error]]
             [re-frame.utils :as utils]))
 
-; scaffold's responsibility is to implement re-frame 0.4.1 functionality on top reusable re-frame parts
+; implement re-frame 0.4.1 functionality on top reusable re-frame parts
 
 (defn make-app-db-atom [& args]
   (apply reagent/atom args))
@@ -50,10 +50,10 @@
 
 (defn register-handler
   ([frame-atom event-id handler-fn]
-   (swap! frame-atom #(frame/register-event-handler % event-id handler-fn)))
+    (swap! frame-atom #(frame/register-event-handler % event-id handler-fn)))
   ([frame-atom event-id middleware handler-fn]
-   (if-let [mid-ware (utils/compose-middleware @frame-atom middleware)]                                               ; compose the middleware
-     (register-handler frame-atom event-id (mid-ware handler-fn)))))                                                  ; wrap the handler in the middleware
+    (if-let [mid-ware (utils/compose-middleware @frame-atom middleware)]                                              ; compose the middleware
+      (register-handler frame-atom event-id (mid-ware handler-fn)))))                                                 ; wrap the handler in the middleware
 
 (defn unregister-handler [frame-atom event-id]
   (swap! frame-atom #(frame/unregister-event-handler % event-id)))
