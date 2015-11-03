@@ -1,5 +1,7 @@
 # pure-frame: a re-frame fork
 
+[![Build Status](https://travis-ci.org/darwin/re-frame.svg)](https://travis-ci.org/darwin/re-frame)
+
 This is a fork of [re-frame](https://github.com/Day8/re-frame) originated in [PR #107](https://github.com/Day8/re-frame/pull/107)
 
 My initial goal was to allow multiple re-frame instances hosted in a single javascript context.
@@ -13,7 +15,7 @@ is expressed as a tranducer which allows great flexibility.
 In your project you should require `re-frame.frame` and call `make-frame` to create your own re-frame instance(s).
 
 For backward compatibility you can require `re-frame.core` you get compatible interface to the re-frame v0.4.1.
-You can see there how was old 0.4.1 re-frame implemented on top of `re-frame.frame`:
+In [v041.cljs](https://github.com/darwin/re-frame/blob/master/src/re_frame/v041.cljs) you can see how was old re-frame implemented on top of `re-frame.frame`:
 
 * there is one global app-db and one global app-frame
 * app-db is backed by reagent/atom
@@ -27,3 +29,5 @@ port it over:
 * removed undoable middleware and related functionality
 * removed pure middleware, because it makes no sense in the new model
 * removed some sanity checks of wrong usage of middle-ware factories to simplify the code a bit
+
+Also I have added some tests.
