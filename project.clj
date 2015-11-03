@@ -19,21 +19,16 @@
   :source-paths []
   :test-paths ["test"]
 
-
-  :cljsbuild {:builds        [{:id           "test"         ;; currently bogus, there is no demo or tests
+  :cljsbuild {:builds        [{:id           "test"                                                                   ;; currently bogus, there is no demo or tests
                                :source-paths ["src" "test"]
                                :compiler     {:output-to     "run/compiled/test.js"
                                               :source-map    "run/compiled/test.js.map"
                                               :output-dir    "run/compiled/test"
-                                              :optimizations :simple ;; https://github.com/cemerick/clojurescript.test/issues/68
+                                              :optimizations :simple                                                  ;; https://github.com/cemerick/clojurescript.test/issues/68
                                               :pretty-print  true}}]
 
-              :test-commands {"rhino"   ["rhino" "-opt" "-1" :rhino-runner "run/compiled/test.js"]
-                              "slimer"  ["xvfb-run" "-a" "slimerjs" :runner "run/compiled/test.js"]
-                              "phantom" ["phantomjs" :runner "run/compiled/test.js"]}} ; doesn't work with phantomjs < 2.0.0
+              :test-commands {"phantom" ["phantomjs" :runner "run/compiled/test.js"]}}                                ; doesn't work with phantomjs < 2.0.0
 
-  :aliases {"auto"         ["do" "clean," "cljsbuild" "clean," "cljsbuild" "auto" "demo,"]
-            "once"         ["do" "clean," "cljsbuild" "clean," "cljsbuild" "once" "demo,"]
-            "test-rhino"   ["do" "clean," "cljsbuild" "once," "cljsbuild" "test" "rhino"]
-            "test-slimer"  ["do" "clean," "cljsbuild" "once," "cljsbuild" "test" "slimer"]
-            "test-phantom" ["do" "clean," "cljsbuild" "once," "cljsbuild" "test" "phantom"]})
+  :aliases {"auto" ["do" "clean," "cljsbuild" "clean," "cljsbuild" "auto" "demo,"]
+            "once" ["do" "clean," "cljsbuild" "clean," "cljsbuild" "once" "demo,"]
+            "test" ["do" "clean," "cljsbuild" "once," "cljsbuild" "test" "phantom"]})
