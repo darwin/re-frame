@@ -3,9 +3,9 @@
   :url "https://github.com/Day8/re-frame.git"
   :license {:name "MIT"}
   :dependencies [[org.clojure/clojure "1.7.0"]
-                 [org.clojure/clojurescript "1.7.107"]
-                 [org.clojure/core.async "0.1.346.0-17112a-alpha"]
-                 [reagent "0.5.0"]]
+                 [org.clojure/clojurescript "1.7.145"]
+                 [org.clojure/core.async "0.2.371"]
+                 [reagent "0.5.1"]]
 
   :profiles {:debug {:debug true}
              :dev   {:dependencies [[spellhouse/clairvoyant "0.0-48-gf5e59d3"]]
