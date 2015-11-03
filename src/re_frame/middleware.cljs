@@ -26,7 +26,7 @@
         (handler db v)
         (catch :default e                                                                                             ; ooops, handler threw
           (do
-            (.error js/console (.-stack e))
+            (error @frame-atom (.-stack e))
             (throw e)))))))
 
 
