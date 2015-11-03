@@ -50,10 +50,10 @@
 
 (defn register-handler
   ([frame-atom event-id handler-fn]
-    (swap! frame-atom #(frame/register-event-handler % event-id handler-fn)))
+   (swap! frame-atom #(frame/register-event-handler % event-id handler-fn)))
   ([frame-atom event-id middleware handler-fn]
-    (if-let [mid-ware (utils/compose-middleware @frame-atom middleware)]                                              ; compose the middleware
-      (register-handler frame-atom event-id (mid-ware handler-fn)))))                                                 ; wrap the handler in the middleware
+   (if-let [mid-ware (utils/compose-middleware @frame-atom middleware)]                                               ; compose the middleware
+     (register-handler frame-atom event-id (mid-ware handler-fn)))))                                                  ; wrap the handler in the middleware
 
 (defn unregister-handler [frame-atom event-id]
   (swap! frame-atom #(frame/unregister-event-handler % event-id)))

@@ -33,7 +33,7 @@
   (if (.-groupEnd js/console)                                                                                         ; groupEnd does not exist  < IE 11
     (.apply (.-groupEnd js/console) js/console (into-array args))))
 
-; -- Logging ---------------------------------------------------------------------------------------------------------
+; -- Logging --------------------------------------------------------------------------------------------------------
 ;
 ; re-frame internally uses a set of logging functions which, by default,
 ; print to js/console.

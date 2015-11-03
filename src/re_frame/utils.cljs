@@ -25,7 +25,7 @@
   (if-not (identical? @db-atom new-db-state)
     (reset! db-atom new-db-state)))
 
-; -- composing middleware  -------------------------------------------------------------------------------------------
+; -- composing middleware  ------------------------------------------------------------------------------------------
 
 (defn compose-middleware
   "Given a vector of middleware, filter out any nils, and use \"comp\" to compose the elements.

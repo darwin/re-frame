@@ -64,7 +64,7 @@
       (handler db (vec (rest v))))))
 
 
-; -- Middleware Factories --------------------------------------------------------------------------------------------
+; -- Middleware Factories -------------------------------------------------------------------------------------------
 
 (defn path
   "A middleware factory which supplies a sub-tree of `db` to the handler.
