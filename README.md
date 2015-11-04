@@ -1,5 +1,11 @@
 # pure-frame: a re-frame fork
 
+## THIS FORK MOVED TO https://github.com/binaryage/pure-frame
+
+By deleting this repo I would break links in [PR #107](https://github.com/Day8/re-frame/pull/107).
+
+---
+
 [![Build Status](https://travis-ci.org/darwin/re-frame.svg)](https://travis-ci.org/darwin/re-frame)
 
 This is a fork of [re-frame](https://github.com/Day8/re-frame) originated in [PR #107](https://github.com/Day8/re-frame/pull/107)
